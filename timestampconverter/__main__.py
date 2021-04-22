@@ -3,6 +3,7 @@
 import argparse
 import logging
 import os
+import platform
 import re
 import sys
 from datetime import datetime
@@ -26,9 +27,9 @@ def _setup_logging(verbosity: int):
 
 
 def _add_arguments():
-    parser.add_argument('directory', type=str)
+    parser.add_argument('destination', type=str)
     parser.add_argument('regex', type=str)
-    parser.add_argument('time-format', type=str)
+    parser.add_argument('timeformat', type=str)
     parser.add_argument('-n', '--no-act')
     parser.add_argument('-v', '--verbose', action='count', default=0)
 
@@ -45,7 +46,7 @@ def main(args: argparse.Namespace):
         match_text = find_match_in_name(file.name, regex)
         if not match_text:
             continue
-        file_time = convert_string_to_datetime(args.time_format, match_text)
+        file_time = convert_string_to_datetime(args.timeformat, match_text)
         if not file_time:
             continue
         new_path = calculate_new_name(file, file_time, match_text)
@@ -58,6 +59,8 @@ def main(args: argparse.Namespace):
 
 def calculate_new_name(file: Path, file_time: datetime, match_text: str) -> Path:
     new_name = file.name.replace(match_text, file_time.isoformat())
+    if platform.system() == 'Windows':
+        new_name = new_name.replace(':', '')
     new_path = Path(file.parent, new_name)
     return new_path
 

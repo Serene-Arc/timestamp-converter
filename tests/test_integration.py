@@ -15,14 +15,14 @@ def args(tmp_path: Path) -> Namespace:
     args.destination = tmp_path
     args.verbose = 1
     args.regex = ''
-    args.time_format = ''
+    args.timeformat = ''
     args.no_act = False
     return args
 
 
 def test_rename_files(args: Namespace, capsys: pytest.CaptureFixture):
-    args.time_format = '%Y-%m-%d_%H-%M'
-    args.regex = r'^(\d{4}-\d{2}-\d{2}_\d{2}-\d{2})'
+    args.timeformat = '%Y-%m-%d_%H-%M'
+    args.regex = r'(\d{4}-\d{2}-\d{2}_\d{2}-\d{2})'
     for i in range(0, 4):
         Path(args.destination, f'2021-04-20_17-49_test_{i}.png').touch()
     main.main(args)
@@ -33,7 +33,7 @@ def test_rename_files(args: Namespace, capsys: pytest.CaptureFixture):
 
 def test_rename_files_no_act(args: Namespace, capsys: pytest.CaptureFixture):
     args.no_act = True
-    args.time_format = '%Y-%m-%d_%H-%M'
+    args.timeformat = '%Y-%m-%d_%H-%M'
     args.regex = r'^(\d{4}-\d{2}-\d{2}_\d{2}-\d{2})'
     create_test_files(args)
     main.main(args)
