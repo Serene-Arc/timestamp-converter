@@ -13,10 +13,12 @@ import timestampconverter.__main__ as main
 def args(tmp_path: Path) -> Namespace:
     args = Namespace()
     args.destination = tmp_path
-    args.verbose = 1
+    args.include_folders = False
+    args.no_act = False
+    args.recursive = False
     args.regex = ''
     args.timeformat = ''
-    args.no_act = False
+    args.verbose = 1
     return args
 
 

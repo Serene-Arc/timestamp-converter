@@ -30,7 +30,11 @@ def _add_arguments():
     parser.add_argument('destination', type=str)
     parser.add_argument('regex', type=str)
     parser.add_argument('timeformat', type=str)
-    parser.add_argument('-n', '--no-act')
+    recursive = parser.add_mutually_exclusive_group()
+
+    recursive.add_argument('-r', '--recursive', action='store_true')
+    recursive.add_argument('--include-folders', action='store_true')
+    parser.add_argument('-n', '--no-act', action='store_true')
     parser.add_argument('-v', '--verbose', action='count', default=0)
 
 
@@ -38,8 +42,18 @@ def main(args: argparse.Namespace):
     _setup_logging(args.verbose)
     args.destination = Path(args.destination).resolve().expanduser()
     directory_contents = []
-    for dirpath, dirnames, filenames in os.walk(args.destination):
-        directory_contents.extend([Path(dirpath, filename).resolve() for filename in filenames])
+
+    if args.recursive:
+        for dirpath, dirnames, filenames in os.walk(args.destination):
+            directory_contents.extend([Path(dirpath, filename).resolve() for filename in filenames])
+            directory_contents.extend([Path(dirpath, dirname).resolve() for dirname in dirnames])
+    else:
+        contents = list(args.destination.iterdir())
+        directory_contents.extend(contents)
+
+    if not args.include_folders:
+        directory_contents = list(filter(lambda f: f.is_file, directory_contents))
+
     logger.info(f'{len(directory_contents)} files found')
     regex = re.compile(args.regex)
     for file in directory_contents:
